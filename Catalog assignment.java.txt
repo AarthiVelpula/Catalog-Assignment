@@ -1,0 +1,64 @@
+
+package shamirsecretsharing;
+import java.util.Scanner;
+
+public class SecretSharing {
+
+    // Function to decode the value from a given base to decimal
+    public static int decodeValue(int base, String value) {
+        return Integer.parseInt(value, base);  // Convert base-n to decimal
+    }
+
+    // Function to calculate Lagrange basis polynomial L_i(0) for x = 0
+    public static double lagrangeBasis(int i, int[] x, int k) {
+        double result = 1.0;
+        for (int j = 0; j < k; j++) {
+            if (j != i) {
+                result *= (0 - x[j]) / (double)(x[i] - x[j]);
+            }
+        }
+        return result;
+    }
+
+    // Function to find the constant term c using Lagrange interpolation
+    public static int findConstantTerm(int k, int[] x, int[] y) {
+        double c = 0.0;
+        for (int i = 0; i < k; i++) {
+            double L_i_0 = lagrangeBasis(i, x, k);  // Calculate L_i(0)
+            c += y[i] * L_i_0;  // Add y_i * L_i(0) to the sum
+        }
+        return (int)Math.round(c);  // Round to nearest integer for the constant term
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Number of roots
+        System.out.print("Enter the number of roots (n): ");
+        int n = sc.nextInt();
+
+        // Minimum number of roots required (k)
+        System.out.print("Enter the minimum number of roots required (k): ");
+        int k = sc.nextInt();
+
+        int[] x = new int[n];  // Array to store x values (roots)
+        int[] y = new int[n];  // Array to store y values (decoded values)
+
+        // Read and decode x and y values from the user
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter the base for x = " + (i + 1) + ": ");
+            int base = sc.nextInt();
+            System.out.print("Enter the encoded value for y at x = " + (i + 1) + ": ");
+            String encodedValue = sc.next();
+            
+            // Decode the value and store it
+            y[i] = decodeValue(base, encodedValue);
+            x[i] = i + 1;  // Assign x-values starting from 1 to n
+        }
+
+        // Only use the first k roots for interpolation
+        
+        int c = findConstantTerm(k, x, y);
+        System.out.println("The constant term (c) is: " + c);
+    }
+}
